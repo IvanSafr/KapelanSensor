@@ -42,8 +42,6 @@ void setup() {
 
   Wire.begin(SDA, SCL);
 
-  
-
   // CO2 (SCD4x) — запускаем периодические измерения
   COSensor.begin();
   COSensor.startPeriodicMeasurement();
