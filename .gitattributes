@@ -1,0 +1,17 @@
+# Все текстовые файлы — CRLF на Windows
+* text=auto eol=crlf
+
+# Исходный код C/C++
+*.cpp text eol=crlf
+*.h   text eol=crlf
+*.c   text eol=crlf
+
+# Конфиги PlatformIO
+*.ini text eol=crlf
+*.json text eol=crlf
+
+# Бинарные файлы — без конвертации
+*.bin binary
+*.o   binary
+*.a   binary
+*.elf binary
