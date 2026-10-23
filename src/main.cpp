@@ -32,9 +32,6 @@ DNSServer dnsServer;
 const char* ssid     = "ESP_Network";
 const char* password = ""; 
 
-// Последнее успешно считанное значение UVS
-uint32_t lastUVS = 0;
-
 void handleNotFound();
 
 
@@ -50,9 +47,6 @@ void setup() {
   // CO2 (SCD4x) — запускаем периодические измерения
   COSensor.begin();
   COSensor.startPeriodicMeasurement();
-  // Компенсируем саморазогрев чипа (~1.8°C): сдвигаем температуру вниз,
-  // это также исправит показания влажности SCD4x
-  COSensor.setTemperatureOffset(1.8f);
 
   // BME680
   bme.begin();
@@ -87,11 +81,6 @@ void setup() {
     // Запускаем измерение BME680 перед чтением полей
     bme.performReading();
 
-    // Читаем UVS только если данные готовы, иначе — берём последнее значение
-    if (ltr.newDataAvailable()) {
-      lastUVS = ltr.readUVS();
-    }
-
     String json = "{";
     json += "\"uptime\":" + String(millis() / 1000) + ","; 
     json += "\"ram\":"    + String(ESP.getFreeHeap()) + ",";  
@@ -105,14 +94,14 @@ void setup() {
     json += "\"hum\":"  + String(COSensor.getHumidity(), 1) + ",";
 
     // Данные с датчика BME680
-    json += "\"temp_b\":"     + String(bme.temperature, 2) + ","; 
-    json += "\"hum_b\":"      + String(bme.humidity, 2) + ","; 
+    json += "\"temp_b\":"    + String(bme.temperature, 2) + ","; 
+    json += "\"hum_b\":"     + String(bme.humidity, 2) + ","; 
     json += "\"pressure_b\":" + String(bme.pressure / 100.0, 2) + ","; 
     // Делим на 1000, чтобы получить кОм
-    json += "\"gas_b\":"      + String(bme.gas_resistance / 1000.0, 2) + ","; 
+    json += "\"gas_b\":"     + String(bme.gas_resistance / 1000.0, 2) + ","; 
 
-    // Данные с датчика LTR390 (UVS) — последнее корректное значение
-    json += "\"uf\":" + String(lastUVS);
+    // Данные с датчика LTR390 (UVS)
+    json += "\"uf\":" + String(ltr.readUVS());
 
     json += "}";
     
